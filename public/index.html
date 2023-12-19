@@ -1,0 +1,47 @@
+<html>
+<head>
+    <title>WebSocket File Watcher</title>
+</head>
+<body>
+    <div id="output"></div>
+
+    <script>
+        const outputDiv = document.getElementById('output');
+        const socket = new WebSocket('ws://localhost:3000');
+        const messageArray = [];
+
+        socket.addEventListener('open', (event) => {
+            console.log('WebSocket connection opened:', event);
+        });
+
+        socket.addEventListener('message', (event) => {
+            const update = event.data;
+            let arr = JSON.parse(update);
+
+            messageArray.push(...arr);
+
+            if (messageArray.length > 10) {
+                messageArray.splice(0, messageArray.length - 10);
+            }
+
+            updateOutput();
+        });
+
+        function updateOutput() {
+            outputDiv.innerHTML = '';
+
+            messageArray.forEach((data) => {
+                outputDiv.innerHTML += `<p>${data}</p>`;
+            });
+        }
+
+        socket.addEventListener('close', (event) => {
+            console.log('WebSocket connection closed:', event);
+        });
+
+        socket.addEventListener('error', (error) => {
+            console.error('WebSocket error:', error);
+        });
+    </script>
+</body>
+</html>
